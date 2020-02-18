@@ -10,8 +10,6 @@ namespace CSConfluenceServiceFW
 {
     public class AddNewPageKompozitResponse : Ac4yServiceResponse
     {
-        public IsPageExistsResult IsPageExistsResult { get; set; }
-        public AddNewPageResult AddNewPageResult { get; set; }
-        public DeletePageResult DeletePageResult { get; set; }
+        public AddNewPageResponse AddNewPageResponse { get; set; }
     }
 }

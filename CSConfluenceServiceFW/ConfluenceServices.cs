@@ -136,38 +136,41 @@ namespace CSConfluenceServiceFW
 
             try
             {
-                response.IsPageExistsResult =
-                    new ConfluenceAPIMetodusok().IsPageExists(
-                        request.URL
-                        , request.PageTitle
-                        , request.SpaceKey
-                        , request.Username
-                        , request.Password
-                        );
+                IsPageExistsResponse isPageExistsResponse =
+                    IsPageExists(new IsPageExistsRequest() { 
+                        PageTitle = request.PageTitle
+                        , Password = request.Password
+                        , Username = request.Username
+                        , URL = request.URL
+                        , SpaceKey = request.SpaceKey
+                    });
 
-                if(response.IsPageExistsResult.FailedResponse == null)
+                if(isPageExistsResponse.Result.Success())
                 {
-                    response.DeletePageResult =
-                        new ConfluenceAPIMetodusok().DeletePage(
-                            request.Password
-                            , request.Username
-                            , request.URL
-                            , request.PageTitle
-                            , request.SpaceKey
-                            );
+                    DeletePageResponse deletePageResponse =
+                        DeletePage(new DeletePageRequest()
+                        {
+                            PageTitle = request.PageTitle
+                            , Password = request.Password
+                            , Username = request.Username
+                            , URL = request.URL
+                            , SpaceKey = request.SpaceKey
+                        });
                 }
 
-                response.AddNewPageResult =
-                    new ConfluenceAPIMetodusok().AddConfluencePage(
-                        request.PageTitle
-                        , request.SpaceKey
-                        , request.ParentPageTitle
-                        , request.Content
-                        , request.URL
-                        , request.Username
-                        , request.Password
-                        ); 
+                AddNewPageResponse addNewPageResponse =
+                    AddNewPage(new AddNewPageRequest()
+                    {
+                        Password = request.Password
+                        , Username = request.Username
+                        , URL = request.URL
+                        , SpaceKey = request.SpaceKey
+                        , ParentPageTitle = request.ParentPageTitle
+                        , PageTitle = request.PageTitle
+                    });
                 response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
+                response.AddNewPageResponse = addNewPageResponse;
             }
             catch (Exception exception)
             {
