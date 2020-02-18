@@ -65,6 +65,8 @@
     <Compile Include="IsPageExistsRequest.cs" />
     <Compile Include="IsPageExistsResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UploadAttachmentCompositeRequest.cs" />
+    <Compile Include="UploadAttachmentCompositeRespone.cs" />
     <Compile Include="UploadAttachmentRequest.cs" />
     <Compile Include="UploadAttachmentResponse.cs" />
   </ItemGroup>

@@ -130,7 +130,7 @@ namespace CSConfluenceServiceFW
             return response;
         }//DeletePage
 
-        public AddNewPageCompositeResponse AddNewPageKompozit(AddNewPageCompositeRequest request)
+        public AddNewPageCompositeResponse AddNewPageComposite(AddNewPageCompositeRequest request)
         {
             AddNewPageCompositeResponse response = new AddNewPageCompositeResponse();
 
@@ -177,8 +177,59 @@ namespace CSConfluenceServiceFW
                 response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
             }
             return response;
-        }//AddNewPageKompozit
+        }//AddNewPageComposite
 
+        public async Task<UploadAttachmentCompositeRespone> UploadAttachmentComposite(UploadAttachmentCompositeRequest request)
+        {
+            UploadAttachmentCompositeRespone response = new UploadAttachmentCompositeRespone();
+
+            try
+            {
+                UploadAttachmentResponse uploadAttachmentResponse = null;
+
+                IsPageExistsResponse isPageExistsResponse =
+                    IsPageExists(new IsPageExistsRequest()
+                    {
+                        PageTitle = request.PageTitle
+                        ,
+                        Password = request.Password
+                        ,
+                        Username = request.Username
+                        ,
+                        URL = request.URL
+                        ,
+                        SpaceKey = request.SpaceKey
+                    });
+
+                if (isPageExistsResponse.Result.Success())
+                {
+                    uploadAttachmentResponse = await
+                        UploadAttachment(new UploadAttachmentRequest()
+                        {
+                            PageTitle = request.PageTitle
+                            ,
+                            Password = request.Password
+                            ,
+                            Username = request.Username
+                            ,
+                            URL = request.URL
+                            ,
+                            SpaceKey = request.SpaceKey
+                            , ImageFileBase64String = request.ImageFileBase64String
+                            , FileName = request.FileName
+                        });
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                }
+
+
+                response.UploadAttachmentResult = uploadAttachmentResponse.UploadAttachmentResult;
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//UploadAttachmentComposite
 
     }
 }
