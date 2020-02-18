@@ -130,9 +130,9 @@ namespace CSConfluenceServiceFW
             return response;
         }//DeletePage
 
-        public AddNewPageKompozitResponse AddNewPageKompozit(AddNewPageKompozitRequest request)
+        public AddNewPageCompositeResponse AddNewPageKompozit(AddNewPageCompositeRequest request)
         {
-            AddNewPageKompozitResponse response = new AddNewPageKompozitResponse();
+            AddNewPageCompositeResponse response = new AddNewPageCompositeResponse();
 
             try
             {
@@ -170,7 +170,7 @@ namespace CSConfluenceServiceFW
                     });
                 response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
 
-                response.AddNewPageResponse = addNewPageResponse;
+                response.AddNewPageResult = addNewPageResponse.AddNewPageResult;
             }
             catch (Exception exception)
             {

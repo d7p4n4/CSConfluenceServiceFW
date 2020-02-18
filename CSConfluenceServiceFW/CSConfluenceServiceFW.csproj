@@ -53,8 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddNewPageKompozitRequest.cs" />
-    <Compile Include="AddNewPageKompozitResponse.cs" />
+    <Compile Include="AddNewPageCompositeRequest.cs" />
+    <Compile Include="AddNewPageCompositeResponse.cs" />
     <Compile Include="AddNewPageRequest.cs" />
     <Compile Include="AddNewPageResponse.cs" />
     <Compile Include="ConfluenceServices.cs" />

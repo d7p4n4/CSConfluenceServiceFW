@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace CSConfluenceServiceFW
 {
-    public class AddNewPageKompozitResponse : Ac4yServiceResponse
+    public class AddNewPageCompositeResponse : Ac4yServiceResponse
     {
-        public AddNewPageResponse AddNewPageResponse { get; set; }
+        public AddNewPageResult AddNewPageResult { get; set; }
     }
 }
