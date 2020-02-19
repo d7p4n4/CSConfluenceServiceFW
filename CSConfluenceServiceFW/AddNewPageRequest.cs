@@ -14,7 +14,7 @@ namespace CSConfluenceServiceFW
         public string URL { get; set; }
         public string SpaceKey { get; set; }
         public string PageTitle { get; set; }
-        public string ParentPageTitle { get; set; }
+        public string ParentPageId { get; set; }
         public string Content { get; set; }
     }
 }

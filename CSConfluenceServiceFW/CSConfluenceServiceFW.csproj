@@ -58,10 +58,14 @@
     <Compile Include="AddNewPageRequest.cs" />
     <Compile Include="AddNewPageResponse.cs" />
     <Compile Include="ConfluenceServices.cs" />
+    <Compile Include="DeletePageCompositeRequest.cs" />
+    <Compile Include="DeletePageCompositeResponse.cs" />
     <Compile Include="DeletePageRequest.cs" />
     <Compile Include="DeletePageResponse.cs" />
     <Compile Include="GetIdByTitleRequest.cs" />
     <Compile Include="GetIdByTitleResponse.cs" />
+    <Compile Include="IsPageExistsCompositeRequest.cs" />
+    <Compile Include="IsPageExistsCompositeResponse.cs" />
     <Compile Include="IsPageExistsRequest.cs" />
     <Compile Include="IsPageExistsResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

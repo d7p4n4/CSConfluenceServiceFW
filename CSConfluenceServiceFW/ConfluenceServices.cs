@@ -20,7 +20,7 @@ namespace CSConfluenceServiceFW
                     new ConfluenceAPIMetodusok().AddConfluencePage(
                         request.PageTitle
                         , request.SpaceKey
-                        , request.ParentPageTitle
+                        , request.ParentPageId
                         , request.Content
                         , request.URL
                         , request.Username
@@ -45,9 +45,8 @@ namespace CSConfluenceServiceFW
                     new ConfluenceAPIMetodusok().UploadAttachment(
                         request.Username
                         , request.Password
-                        , request.SpaceKey
                         , request.URL
-                        , request.PageTitle
+                        , request.PageId
                         , request.ImageFileBase64String
                         , request.FileName
                         );
@@ -93,7 +92,7 @@ namespace CSConfluenceServiceFW
                 response.IsPageExistsResult =
                     new ConfluenceAPIMetodusok().IsPageExists(
                         request.URL
-                        , request.PageTitle
+                        , request.PageId
                         , request.SpaceKey
                         , request.Username
                         , request.Password
@@ -107,6 +106,56 @@ namespace CSConfluenceServiceFW
             return response;
         }//IsPageExists
 
+
+        public IsPageExistsCompositeResponse IsPageExistsComposite(IsPageExistsCompositeRequest request)
+        {
+            IsPageExistsCompositeResponse response = new IsPageExistsCompositeResponse();
+
+            try
+            {
+                GetIdByTitleResponse getIdByTitleResponse =
+                    GetIdByTitle(new GetIdByTitleRequest()
+                    {
+                        Password = request.Password
+                        , PageTitle = request.PageTitle
+                        , Username = request.Username
+                        , URL = request.URL
+                        , SpaceKey = request.SpaceKey
+                    });
+
+                response.GetIdByTitleResult = getIdByTitleResponse.GetIdByTitleResult;
+
+                if (getIdByTitleResponse.Result.Success() && getIdByTitleResponse.GetIdByTitleResult.SuccessResponse.Results.Count > 0)
+                {
+                    IsPageExistsResponse isPageExistsResponse =
+                        IsPageExists(new IsPageExistsRequest()
+                        {
+                            Password = request.Password
+                            ,
+                            Username = request.Username
+                            ,
+                            URL = request.URL
+                            ,
+                            SpaceKey = request.SpaceKey
+                            ,
+                            PageId = getIdByTitleResponse.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                        });
+
+                    response.isPageExistsResult = isPageExistsResponse.IsPageExistsResult;
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                }
+                else
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs ilyen nevű oldal!" };
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//IsPageExistsComposite
+
         public DeletePageResponse DeletePage(DeletePageRequest request)
         {
             DeletePageResponse response = new DeletePageResponse();
@@ -118,7 +167,7 @@ namespace CSConfluenceServiceFW
                         request.Password
                         , request.Username
                         , request.URL
-                        , request.PageTitle
+                        , request.PageId
                         , request.SpaceKey
                         );
                 response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
@@ -130,14 +179,15 @@ namespace CSConfluenceServiceFW
             return response;
         }//DeletePage
 
-        public AddNewPageCompositeResponse AddNewPageComposite(AddNewPageCompositeRequest request)
+        public DeletePageCompositeResponse DeletePageComposite(DeletePageCompositeRequest request)
         {
-            AddNewPageCompositeResponse response = new AddNewPageCompositeResponse();
+            DeletePageCompositeResponse response = new DeletePageCompositeResponse();
 
             try
             {
-                IsPageExistsResponse isPageExistsResponse =
-                    IsPageExists(new IsPageExistsRequest() { 
+                IsPageExistsCompositeResponse isPageExistsCompositeResponse =
+                    IsPageExistsComposite(new IsPageExistsCompositeRequest()
+                    {
                         PageTitle = request.PageTitle
                         , Password = request.Password
                         , Username = request.Username
@@ -145,28 +195,86 @@ namespace CSConfluenceServiceFW
                         , SpaceKey = request.SpaceKey
                     });
 
-                if(isPageExistsResponse.Result.Success())
+                if (isPageExistsCompositeResponse.Result.Success())
                 {
                     DeletePageResponse deletePageResponse =
                         DeletePage(new DeletePageRequest()
                         {
-                            PageTitle = request.PageTitle
-                            , Password = request.Password
-                            , Username = request.Username
-                            , URL = request.URL
-                            , SpaceKey = request.SpaceKey
+                            PageId = isPageExistsCompositeResponse.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                            ,
+                            Password = request.Password
+                            ,
+                            Username = request.Username
+                            ,
+                            URL = request.URL
+                            ,
+                            SpaceKey = request.SpaceKey
                         });
+
+                    response.DeletePageResult = deletePageResponse.DeletePageResult;
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
                 }
+                else
+                {
+                    response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem létezik ilyen névvel oldal!" });
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//DeletePageComposite
+
+        public AddNewPageCompositeResponse AddNewPageComposite(AddNewPageCompositeRequest request)
+        {
+            AddNewPageCompositeResponse response = new AddNewPageCompositeResponse();
+
+            try
+            {
+                DeletePageCompositeResponse deletePageCompositeResponse =
+                    DeletePageComposite(new DeletePageCompositeRequest()
+                    {
+                        PageTitle = request.PageTitle
+                        ,
+                        Password = request.Password
+                        ,
+                        Username = request.Username
+                        ,
+                        URL = request.URL
+                        ,
+                        SpaceKey = request.SpaceKey
+                    });
+
+                IsPageExistsCompositeResponse isPageExistsCompositeResponseParentPage =
+                    IsPageExistsComposite(new IsPageExistsCompositeRequest()
+                    {
+                        PageTitle = request.PageTitle
+                        ,
+                        Password = request.Password
+                        ,
+                        Username = request.Username
+                        ,
+                        URL = request.URL
+                        ,
+                        SpaceKey = request.SpaceKey
+                    });
 
                 AddNewPageResponse addNewPageResponse =
                     AddNewPage(new AddNewPageRequest()
                     {
                         Password = request.Password
-                        , Username = request.Username
-                        , URL = request.URL
-                        , SpaceKey = request.SpaceKey
-                        , ParentPageTitle = request.ParentPageTitle
-                        , PageTitle = request.PageTitle
+                        ,
+                        Username = request.Username
+                        ,
+                        URL = request.URL
+                        ,
+                        SpaceKey = request.SpaceKey
+                        ,
+                        ParentPageId = isPageExistsCompositeResponseParentPage.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                        ,
+                        PageTitle = request.PageTitle
                     });
                 response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
 
@@ -187,8 +295,8 @@ namespace CSConfluenceServiceFW
             {
                 UploadAttachmentResponse uploadAttachmentResponse = null;
 
-                IsPageExistsResponse isPageExistsResponse =
-                    IsPageExists(new IsPageExistsRequest()
+                IsPageExistsCompositeResponse isPageExistsCompositeResponse =
+                    IsPageExistsComposite(new IsPageExistsCompositeRequest()
                     {
                         PageTitle = request.PageTitle
                         ,
@@ -201,28 +309,30 @@ namespace CSConfluenceServiceFW
                         SpaceKey = request.SpaceKey
                     });
 
-                if (isPageExistsResponse.Result.Success())
+                if (isPageExistsCompositeResponse.Result.Success())
                 {
                     uploadAttachmentResponse = await
                         UploadAttachment(new UploadAttachmentRequest()
                         {
-                            PageTitle = request.PageTitle
+                            PageId = isPageExistsCompositeResponse.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
                             ,
                             Password = request.Password
                             ,
                             Username = request.Username
                             ,
                             URL = request.URL
-                            ,
-                            SpaceKey = request.SpaceKey
+                            
                             , ImageFileBase64String = request.ImageFileBase64String
                             , FileName = request.FileName
                         });
                     response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    response.UploadAttachmentResult = uploadAttachmentResponse.UploadAttachmentResult;
+                }
+                else
+                {
+                    response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs oldal a megadott címmel!"});
                 }
 
-
-                response.UploadAttachmentResult = uploadAttachmentResponse.UploadAttachmentResult;
             }
             catch (Exception exception)
             {

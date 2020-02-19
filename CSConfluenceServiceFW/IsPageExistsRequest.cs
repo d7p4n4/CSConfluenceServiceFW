@@ -13,6 +13,6 @@ namespace CSConfluenceServiceFW
         public string Username { get; set; }
         public string URL { get; set; }
         public string SpaceKey { get; set; }
-        public string PageTitle { get; set; }
+        public string PageId { get; set; }
     }
 }

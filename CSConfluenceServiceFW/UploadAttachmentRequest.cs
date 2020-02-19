@@ -12,8 +12,7 @@ namespace CSConfluenceServiceFW
         public string Password { get; set; }
         public string Username { get; set; }
         public string URL { get; set; }
-        public string SpaceKey { get; set; }
-        public string PageTitle { get; set; }
+        public string PageId { get; set; }
         public string FileName { get; set; }
         public string ImageFileBase64String { get; set; }
     }
