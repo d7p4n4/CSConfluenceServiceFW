@@ -156,6 +156,31 @@ namespace CSConfluenceServiceFW
             return response;
         }//IsPageExistsComposite
 
+        public UpdatePageResponse UpdatePage(UpdatePageRequest request)
+        {
+            UpdatePageResponse response = new UpdatePageResponse();
+
+            try
+            {
+                response.UpdatePageResult =
+                    new ConfluenceAPIMetodusok().UpdateConfluencePage(
+                        request.Password
+                        , request.Username
+                        , request.URL
+                        , request.PageId
+                        , request.Content
+                        , request.VersionNumber
+                        , request.PageTitle
+                        );
+                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//DeletePage
+
         public DeletePageResponse DeletePage(DeletePageRequest request)
         {
             DeletePageResponse response = new DeletePageResponse();
@@ -250,7 +275,7 @@ namespace CSConfluenceServiceFW
                 IsPageExistsCompositeResponse isPageExistsCompositeResponseParentPage =
                     IsPageExistsComposite(new IsPageExistsCompositeRequest()
                     {
-                        PageTitle = request.PageTitle
+                        PageTitle = request.ParentPageTitle
                         ,
                         Password = request.Password
                         ,
@@ -261,24 +286,32 @@ namespace CSConfluenceServiceFW
                         SpaceKey = request.SpaceKey
                     });
 
-                AddNewPageResponse addNewPageResponse =
-                    AddNewPage(new AddNewPageRequest()
-                    {
-                        Password = request.Password
-                        ,
-                        Username = request.Username
-                        ,
-                        URL = request.URL
-                        ,
-                        SpaceKey = request.SpaceKey
-                        ,
-                        ParentPageId = isPageExistsCompositeResponseParentPage.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
-                        ,
-                        PageTitle = request.PageTitle
-                    });
-                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                if (isPageExistsCompositeResponseParentPage.Result.Success())
+                {
+                    AddNewPageResponse addNewPageResponse =
+                        AddNewPage(new AddNewPageRequest()
+                        {
+                            Password = request.Password
+                            ,
+                            Username = request.Username
+                            ,
+                            URL = request.URL
+                            ,
+                            SpaceKey = request.SpaceKey
+                            ,
+                            ParentPageId = isPageExistsCompositeResponseParentPage.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                            ,
+                            PageTitle = request.PageTitle
+                            , Content = request.Content
+                        });
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
 
-                response.AddNewPageResult = addNewPageResponse.AddNewPageResult;
+                    response.AddNewPageResult = addNewPageResponse.AddNewPageResult;
+                }
+                else
+                {
+                    response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs oldal a szülőoldal névvel!" });
+                }
             }
             catch (Exception exception)
             {
