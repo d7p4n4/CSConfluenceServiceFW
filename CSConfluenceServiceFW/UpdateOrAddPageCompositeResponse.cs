@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace CSConfluenceServiceFW
 {
-    public class IsPageExistsCompositeResponse : Ac4yServiceResponse
+    public class UpdateOrAddPageCompositeResponse : Ac4yServiceResponse
     {
-        public IsPageExistsResult isPageExistsResult { get; set; }
+        public AddNewPageResult AddNewPageResult { get; set; }
+        public UpdatePageResult UpdatePageResult { get; set; }
     }
 }

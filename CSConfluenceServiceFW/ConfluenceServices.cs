@@ -73,7 +73,15 @@ namespace CSConfluenceServiceFW
                         , request.URL
                         , request.PageTitle
                         );
-                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
+                if (response.GetIdByTitleResult.FailedResponse == null && response.GetIdByTitleResult.SuccessResponse.Results.Count > 0)
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                }
+                else
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs ilyen nevű oldal! Nincs ID!" };
+                }
             }
             catch (Exception exception)
             {
@@ -97,7 +105,16 @@ namespace CSConfluenceServiceFW
                         , request.Username
                         , request.Password
                         );
-                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
+                if (response.IsPageExistsResult.FailedResponse == null)
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                }
+                else
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs ilyen nevű oldal!" };
+
+                }
             }
             catch (Exception exception)
             {
@@ -122,10 +139,8 @@ namespace CSConfluenceServiceFW
                         , URL = request.URL
                         , SpaceKey = request.SpaceKey
                     });
-
-                response.GetIdByTitleResult = getIdByTitleResponse.GetIdByTitleResult;
-
-                if (getIdByTitleResponse.Result.Success() && getIdByTitleResponse.GetIdByTitleResult.SuccessResponse.Results.Count > 0)
+                
+                if (getIdByTitleResponse.Result.Success())
                 {
                     IsPageExistsResponse isPageExistsResponse =
                         IsPageExists(new IsPageExistsRequest()
@@ -142,11 +157,18 @@ namespace CSConfluenceServiceFW
                         });
 
                     response.isPageExistsResult = isPageExistsResponse.IsPageExistsResult;
-                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    if (isPageExistsResponse.IsPageExistsResult.FailedResponse == null)
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    }
+                    else
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs ilyen nevű oldal!" };
+                    }
                 }
                 else
                 {
-                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs ilyen nevű oldal!" };
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs ilyen nevű oldal! Nincs ID!" };
                 }
             }
             catch (Exception exception)
@@ -172,14 +194,22 @@ namespace CSConfluenceServiceFW
                         , request.VersionNumber
                         , request.PageTitle
                         );
-                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
+                if (response.UpdatePageResult.FailedResponse == null)
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                }
+                else
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült a frissítés!" };
+                }
             }
             catch (Exception exception)
             {
                 response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
             }
             return response;
-        }//DeletePage
+        }//UpdatePage
 
         public DeletePageResponse DeletePage(DeletePageRequest request)
         {
@@ -195,7 +225,15 @@ namespace CSConfluenceServiceFW
                         , request.PageId
                         , request.SpaceKey
                         );
-                response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
+                if (response.DeletePageResult.FailedResponse == null)
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                }
+                else
+                {
+                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült a törlés!" };
+                }
             }
             catch (Exception exception)
             {
@@ -225,7 +263,7 @@ namespace CSConfluenceServiceFW
                     DeletePageResponse deletePageResponse =
                         DeletePage(new DeletePageRequest()
                         {
-                            PageId = isPageExistsCompositeResponse.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                            PageId = isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Id.ToString()
                             ,
                             Password = request.Password
                             ,
@@ -237,7 +275,15 @@ namespace CSConfluenceServiceFW
                         });
 
                     response.DeletePageResult = deletePageResponse.DeletePageResult;
-                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+
+                    if (response.DeletePageResult.FailedResponse == null)
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    }
+                    else
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült a törlés!" };
+                    }
 
                 }
                 else
@@ -299,14 +345,22 @@ namespace CSConfluenceServiceFW
                             ,
                             SpaceKey = request.SpaceKey
                             ,
-                            ParentPageId = isPageExistsCompositeResponseParentPage.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                            ParentPageId = isPageExistsCompositeResponseParentPage.isPageExistsResult.SuccessResponse.Id.ToString()
                             ,
                             PageTitle = request.PageTitle
                             , Content = request.Content
                         });
-                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
-
+                    
                     response.AddNewPageResult = addNewPageResponse.AddNewPageResult;
+
+                    if (response.AddNewPageResult.FailedResponse == null)
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    }
+                    else
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült az oldalt létrehozni!" };
+                    }
                 }
                 else
                 {
@@ -347,7 +401,7 @@ namespace CSConfluenceServiceFW
                     uploadAttachmentResponse = await
                         UploadAttachment(new UploadAttachmentRequest()
                         {
-                            PageId = isPageExistsCompositeResponse.GetIdByTitleResult.SuccessResponse.Results[0].Id.ToString()
+                            PageId = isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Id.ToString()
                             ,
                             Password = request.Password
                             ,
@@ -358,8 +412,16 @@ namespace CSConfluenceServiceFW
                             , ImageFileBase64String = request.ImageFileBase64String
                             , FileName = request.FileName
                         });
-                    response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
                     response.UploadAttachmentResult = uploadAttachmentResponse.UploadAttachmentResult;
+
+                    if (response.UploadAttachmentResult.FailedResponse == null)
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    }
+                    else
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült feltölteni a képet!" };
+                    }
                 }
                 else
                 {
@@ -373,6 +435,116 @@ namespace CSConfluenceServiceFW
             }
             return response;
         }//UploadAttachmentComposite
+
+        public UpdateOrAddPageCompositeResponse UpdateOrAddPageComposite(UpdateOrAddPageCompositeRequest request)
+        {
+            UpdateOrAddPageCompositeResponse response = new UpdateOrAddPageCompositeResponse();
+
+            try
+            {
+                IsPageExistsCompositeResponse isPageExistsCompositeResponse =
+                    IsPageExistsComposite(new IsPageExistsCompositeRequest()
+                    {
+                        PageTitle = request.PageTitle
+                        ,
+                        Password = request.Password
+                        ,
+                        Username = request.Username
+                        ,
+                        URL = request.URL
+                        ,
+                        SpaceKey = request.SpaceKey
+                    });
+
+                if (isPageExistsCompositeResponse.Result.Success())
+                {
+                    UpdatePageResponse updatePageResponse =
+                        UpdatePage(new UpdatePageRequest()
+                        {
+                            PageId = isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Id.ToString()
+                            ,
+                            PageTitle = request.PageTitle
+                            ,
+                            Password = request.Password
+                            ,
+                            Username = request.Username
+                            ,
+                            URL = request.URL
+                            ,
+                            VersionNumber = isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Version.Number.ToString()
+                        });
+
+                    response.UpdatePageResult = updatePageResponse.UpdatePageResult;
+
+                    if (response.UpdatePageResult.FailedResponse == null)
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                    }
+                    else
+                    {
+                        response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült frissíteni az oldalt!" };
+                    }
+
+                }
+                else
+                {
+
+                    IsPageExistsCompositeResponse isPageExistsCompositeResponseParentPage =
+                        IsPageExistsComposite(new IsPageExistsCompositeRequest()
+                        {
+                            PageTitle = request.ParentPageTitle
+                            ,
+                            Password = request.Password
+                            ,
+                            Username = request.Username
+                            ,
+                            URL = request.URL
+                            ,
+                            SpaceKey = request.SpaceKey
+                        });
+
+                    if (isPageExistsCompositeResponseParentPage.Result.Success())
+                    {
+                        AddNewPageResponse addNewPageResponse =
+                            AddNewPage(new AddNewPageRequest()
+                            {
+                                Password = request.Password
+                                ,
+                                Username = request.Username
+                                ,
+                                URL = request.URL
+                                ,
+                                SpaceKey = request.SpaceKey
+                                ,
+                                ParentPageId = isPageExistsCompositeResponseParentPage.isPageExistsResult.SuccessResponse.Id.ToString()
+                                ,
+                                PageTitle = request.PageTitle
+                                ,
+                                Content = request.Content
+                            });
+                        response.AddNewPageResult = addNewPageResponse.AddNewPageResult;
+
+                        if (response.UpdatePageResult.FailedResponse == null)
+                        {
+                            response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
+                        }
+                        else
+                        {
+                            response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nem sikerült az új oldalt létrehozni!" };
+                        }
+                    }
+                    else
+                    {
+                        response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = "Nincs oldal a szülőoldal névvel!" });
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Result = (new Ac4yProcessResult() { Code = Ac4yProcessResult.FAIL, Message = exception.Message, Description = exception.StackTrace });
+            }
+            return response;
+        }//AddNewPageComposite
 
     }
 }
