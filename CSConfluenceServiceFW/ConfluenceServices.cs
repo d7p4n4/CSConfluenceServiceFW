@@ -186,13 +186,13 @@ namespace CSConfluenceServiceFW
             {
                 response.UpdatePageResult =
                     new ConfluenceAPIMetodusok().UpdateConfluencePage(
-                        request.Password
-                        , request.Username
-                        , request.URL
+                        request.PageTitle
                         , request.PageId
                         , request.Content
+                        , request.URL
+                        , request.Username
+                        , request.Password
                         , request.VersionNumber
-                        , request.PageTitle
                         );
 
                 if (response.UpdatePageResult.FailedResponse == null)
@@ -471,7 +471,8 @@ namespace CSConfluenceServiceFW
                             ,
                             URL = request.URL
                             ,
-                            VersionNumber = isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Version.Number.ToString()
+                            VersionNumber = (isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Version.Number + 1).ToString()
+                            , Content = request.Content
                         });
 
                     response.UpdatePageResult = updatePageResponse.UpdatePageResult;
