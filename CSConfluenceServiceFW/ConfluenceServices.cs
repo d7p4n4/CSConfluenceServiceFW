@@ -35,13 +35,13 @@ namespace CSConfluenceServiceFW
             return response;
         }//AddNewPage
 
-        public async Task<UploadAttachmentResponse> UploadAttachment(UploadAttachmentRequest request)
+        public UploadAttachmentResponse UploadAttachment(UploadAttachmentRequest request)
         {
             UploadAttachmentResponse response = new UploadAttachmentResponse();
 
             try
             {
-                response.UploadAttachmentResult = await
+                response.UploadAttachmentResult =
                     new ConfluenceAPIMetodusok().UploadAttachment(
                         request.Username
                         , request.Password
@@ -374,9 +374,9 @@ namespace CSConfluenceServiceFW
             return response;
         }//AddNewPageComposite
 
-        public async Task<UploadAttachmentCompositeRespone> UploadAttachmentComposite(UploadAttachmentCompositeRequest request)
+        public UploadAttachmentCompositeResponse UploadAttachmentComposite(UploadAttachmentCompositeRequest request)
         {
-            UploadAttachmentCompositeRespone response = new UploadAttachmentCompositeRespone();
+            UploadAttachmentCompositeResponse response = new UploadAttachmentCompositeResponse();
 
             try
             {
@@ -398,7 +398,7 @@ namespace CSConfluenceServiceFW
 
                 if (isPageExistsCompositeResponse.Result.Success())
                 {
-                    uploadAttachmentResponse = await
+                    uploadAttachmentResponse =
                         UploadAttachment(new UploadAttachmentRequest()
                         {
                             PageId = isPageExistsCompositeResponse.isPageExistsResult.SuccessResponse.Id.ToString()
@@ -408,9 +408,11 @@ namespace CSConfluenceServiceFW
                             Username = request.Username
                             ,
                             URL = request.URL
-                            
-                            , ImageFileBase64String = request.ImageFileBase64String
-                            , FileName = request.FileName
+
+                            ,
+                            ImageFileBase64String = request.ImageFileBase64String
+                            ,
+                            FileName = request.FileName
                         });
                     response.UploadAttachmentResult = uploadAttachmentResponse.UploadAttachmentResult;
 
@@ -525,7 +527,7 @@ namespace CSConfluenceServiceFW
                             });
                         response.AddNewPageResult = addNewPageResponse.AddNewPageResult;
 
-                        if (response.UpdatePageResult.FailedResponse == null)
+                        if (response.AddNewPageResult.FailedResponse == null)
                         {
                             response.Result = new Ac4yProcessResult() { Code = Ac4yProcessResult.SUCCESS };
                         }
